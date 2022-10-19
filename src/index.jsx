@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
+import Header from './components/Header';
 import ToppingsSelect from './components/ToppingsSelect';
+import { PrefsContext } from './prefs.context';
 import './style.css';
 
 const toppings = [
@@ -79,19 +81,26 @@ const toppings = [
 ];
 
 const App = () => {
+  const [veganOnly, setVeganOnly] = useState({ veganOnly: true });
+
+  const setPreferences = (veganOnlyPref) => {
+    setVeganOnly({ veganOnly: veganOnlyPref });
+  };
+
   return (
-    <div className="container">
-      <header>
-        <div className="pizza" />
-        <h1>Build your own pizza</h1>
-      </header>
-      <main>
-        <ToppingsSelect toppings={toppings} />
-      </main>
-    </div>
+    <PrefsContext.Provider value={{ ...veganOnly, setPreferences }}>
+      <div className="container">
+        <header>
+          <div className="pizza" />
+          <h1>Build your own pizza</h1>
+          <Header />
+        </header>
+        <main>
+          <ToppingsSelect toppings={toppings} />
+        </main>
+      </div>
+    </PrefsContext.Provider>
   );
 };
 
-createRoot(
-  document.querySelector('#app'),
-).render(<App />);
+createRoot(document.querySelector('#app')).render(<App />);
