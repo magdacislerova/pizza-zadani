@@ -83,8 +83,43 @@ const toppings = [
 const App = () => {
   const [veganOnly, setVeganOnly] = useState({ veganOnly: true });
 
+  const [toppingsList, setToppingsList] = useState(toppings);
+  const [toppingsPrice, setPrice] = useState(0);
+  const [toppingsCount, setCount] = useState(0);
+
+  const handleSelectedToppingsChange = (index) => {
+    const newToppings = [...toppingsList];
+    newToppings[index].selected = !newToppings[index].selected;
+    setToppingsList(newToppings);
+    calculate(toppingsList);
+  };
+
+  const calculate = (toppingsList) => {
+    let toppingsPrice = 0;
+    let toppingsCount = 0;
+    toppingsList.forEach((topping) =>
+      topping.selected
+        ? (toppingsCount += 1) && (toppingsPrice += topping.price)
+        : null,
+    );
+    setPrice(Math.round((toppingsPrice + Number.EPSILON) * 100) / 100);
+    setCount(toppingsCount);
+  };
+
+  const resetToppings = () => {
+    const updatedToppings = [...toppingsList];
+    updatedToppings.forEach((topping) =>
+      !topping.vegan ? (topping.selected = false) : null,
+    );
+    setToppingsList(updatedToppings);
+    calculate(toppingsList);
+  };
+
   const setPreferences = (veganOnlyPref) => {
     setVeganOnly({ veganOnly: veganOnlyPref });
+    if (veganOnly) {
+      resetToppings();
+    }
   };
 
   return (
@@ -96,7 +131,12 @@ const App = () => {
           <Header />
         </header>
         <main>
-          <ToppingsSelect toppings={toppings} />
+          <ToppingsSelect
+            toppings={toppings}
+            toppingsCount={toppingsCount}
+            toppingsPrice={toppingsPrice}
+            onToppingsChange={handleSelectedToppingsChange}
+          />
         </main>
       </div>
     </PrefsContext.Provider>
